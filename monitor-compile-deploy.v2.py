@@ -61,10 +61,13 @@ for event in i.event_gen():
     print source_file,
     print "compiling...",
     sys.stdout.flush()
-    rval = subprocess.call("javac " + source_file, shell=True)
+    p = subprocess.Popen("javac " + source_file, stderr=subprocess.PIPE, shell=True)
+    (stout, sterr) = p.communicate()
+    rval = p.wait()
     if rval != 0:
         print
         print "encountered compile error"
+        print sterr
         continue
     print "moving...",
     sys.stdout.flush()
@@ -72,7 +75,6 @@ for event in i.event_gen():
         shutil.move(compiled_file, dest_file)
     except: # move isn't erroring right now. It is actually
             # overwriting files it shouldn't be able to
-            # overwrite right now
         print
         print "encountered error while moving class"
         continue
